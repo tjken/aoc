@@ -1,6 +1,7 @@
-import arg_parser
 import math
-from typing import TypedDict, TypeAlias, Iterable, Self
+from typing import Iterable
+
+from lib import aoc_main
 
 
 class Game:
@@ -8,7 +9,7 @@ class Game:
     numbers: set[int]
     winning_numbers: set[int]
 
-    def __init__ (self, info: str):
+    def __init__(self, info: str):
         # Reformat the info string; now formatted in a list as:
         # {game_id}: winning numbers | numbers
         info_ = info.removeprefix("Card").strip().split()
@@ -17,7 +18,6 @@ class Game:
         separator_idx = info_.index('|')
         self.winning_numbers = set(map(int, info_[:separator_idx]))
         self.numbers = set(map(int, info_[separator_idx + 1:]))
-
 
     def matching_numbers(self) -> set[int]:
         return set.intersection(self.numbers, self.winning_numbers)
@@ -74,12 +74,8 @@ def part_2(games: Iterable[str]):
         elif len(additional_cards_queue) == 0:
             additional_cards_queue.append(0)
 
-
     return sum_
 
 
 if __name__ == '__main__':
-    import sys
-
-    args = arg_parser.parse("04.py")
-    sys.exit(main(args.files))
+    aoc_main("04.py", [part_1, part_2])

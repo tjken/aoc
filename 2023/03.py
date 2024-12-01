@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 import sys
-import arg_parser
+from lib import aoc_main
 from itertools import product
 from math import prod
 from typing import TypeAlias
@@ -11,15 +12,45 @@ _comparison_idx_range = tuple(filter(lambda x: x != (0, 0), product(range(-1, 2)
 
 
 def _build_item_table(lines) -> dict:
-    def add_number(num: str, idx: tuple[int, int]):
-        _id = _generate_item_id()
-        for i in range(len(num)): item_table[(idx[0], idx[1] + i)] = (_id, num)
+    def add_number(x_idx, num_info_) -> None:
+        """Add a number to item_table at a given index.
 
-    def _add_num_info(x_idx, num_info_): # TODO: Fold this function into add_number
-        add_number(num_info_[2], (x_idx, num_info_[1]))
+        Numbers are taken and stored as a string. Since numbers are non-unique, they are assigned an id number,
+        and it's used as its key in the table. If a number is more than a single digit in length, the whole
+        number is read and assigned to every index it's found in.
+
+        The parameters for this function are holdovers from an old helper function. It's not great, but a
+        possible rewrite is not in consideration at the moment.
+
+        :param x_idx: x-index of the numbers location in the table.
+        :param num_info_: information used by the _build_item_table function to help make a number entry.
+        :return: None
+        """
+
+        """The num_info_ format goes as follows:
+            1: a bool flag indicating working number information; this function resets this to False before
+            returning.
+
+            2: the y-index of the working number; if the number is more than one digit long, this function will
+            assign it to all y-indices it occupies.
+
+            3: the working number value, as a string.
+        """
+        num = num_info_[2]
+        index = x_idx, num_info_[1]
+        _id = _generate_item_id()
+        # Adds the number to every index it occupies into the item_table
+        for i in range(len(num)): item_table[(index[0], index[1] + i)] = (_id, num)
+
         num_info_[0] = False
 
-    def add_machine_part(s: str, idx: tuple[int, int]):
+    def add_machine_part(s: str, idx: tuple[int, int]) -> None:
+        """Adds a machine part to item_table.
+
+        :param s: string representing the part. It should only be one character.
+        :param idx: tuple represeting the x, y coordinates of the part in the table.
+        :return: None
+        """
         _id = _generate_item_id()
         item_table[idx] = (_id, s)
 
@@ -29,7 +60,7 @@ def _build_item_table(lines) -> dict:
     # search lines for numbers and machine symbols
     for idx_x, line in enumerate(lines):  # TODO: Check if we can use product for x,y coordinates
         # If there is num_info when checking a new line, then the previous line ended with a number.
-        if num_info[0]: _add_num_info(idx_x - 1, num_info)
+        if num_info[0]: add_number(idx_x - 1, num_info)
 
         for idx_y, ch in enumerate(line):
             if _is_number(ch):
@@ -42,7 +73,7 @@ def _build_item_table(lines) -> dict:
                 continue
 
             # Add previous number data if it's stored before checking other possibilities
-            if num_info[0]: _add_num_info(idx_x, num_info)
+            if num_info[0]: add_number(idx_x, num_info)
 
             if _is_machine_part(ch):
                 # Register machine part if found
@@ -51,6 +82,9 @@ def _build_item_table(lines) -> dict:
 
             # End of inner loop
         # End of outer loop
+    # If there's number info still in num_info, add it to the table.
+    if num_info[0]:
+        add_number(len(lines) - 1, num_info)
     return item_table
 
 
@@ -69,7 +103,7 @@ def _get_relative_idxs(index: tuple[int, int]) -> list[tuple[int, int]]:
 
 
 def _is_machine_part(ch: str) -> bool:
-    if ch.isdigit() or ch == '.':
+    if ch.isdigit() or ch == '.' or ch == '\n':
         return False
     else:
         return True
@@ -117,6 +151,7 @@ def part_1(lines: list) -> int:
     for gear in gears: value_items.update(gear[1])
     return sum(value_items.values())
 
+
 def part_2(lines: list) -> int:
     _sum = 0
     gears = _part_0(lines)
@@ -129,23 +164,5 @@ def part_2(lines: list) -> int:
     return _sum
 
 
-def main(files: list[str, ...]) -> None:
-    results = []
-    for file in files:
-        with open(file) as f:
-            _input = f.readlines()
-
-        p1 = part_1(_input)
-        p2 = part_2(_input)
-
-        results.append((file, p1, p2))
-
-    for r in results:
-        print(f'--{r[0]}--\nP1: {r[1]}\nP2: {r[2]}')
-    return
-
 if __name__ == "__main__":
-    args = arg_parser.parse("03.py")
-
-    sys.exit(main(args.files))
-
+    aoc_main('03.py', [part_1, part_2])

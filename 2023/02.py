@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 from math import prod
-import arg_parser
+from typing import Iterable
 
+from lib import aoc_main
 
 comparison = {'red': 12, 'green': 13, 'blue': 14}
 
@@ -46,7 +48,8 @@ def _lt_dict(d1, d2) -> bool:
     return True
 
 
-def part_1(games: dict) -> int:
+def part_1(inputs_: Iterable[str]) -> int:
+    games = read_games(inputs_)
     s = 0
     for key in games.keys():
         if _lt_dict(games[key], comparison): s += key
@@ -54,7 +57,8 @@ def part_1(games: dict) -> int:
     return s
 
 
-def part_2(games: dict) -> int:
+def part_2(inputs_: Iterable[str]) -> int:
+    games = read_games(inputs_)
     s = 0
     for entry in games.values():
         s += prod(list(entry.values()))
@@ -62,23 +66,5 @@ def part_2(games: dict) -> int:
     return s
 
 
-def main(files: list[str, ...]) -> None:
-    results = []
-    for file in files:
-        with open(file) as f:
-            inputs = f.readlines()
-
-        p1 = part_1(read_games(inputs))
-        p2 = part_2(read_games(inputs))
-
-        results.append((file, p1, p2))
-
-    for r in results:
-        print(f'--{r[0]}--\nP1: {r[1]}\nP2: {r[2]}')
-    return
-
 if __name__ == '__main__':
-    import sys
-
-    args = arg_parser.parse('02.py')
-    sys.exit(main(args.files))
+    aoc_main('02.py', [part_1, part_2])
