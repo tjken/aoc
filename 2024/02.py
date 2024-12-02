@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Advent of Code 2024 - Day 2: Red-Nosed Reports
+
+This script is written to complete a puzzle from the Advent of Code 2024 event. For puzzle information,
+please visit https://adventofcode.com/2024/day/2
+
+All the scripts in this repository use a shared lib module to facilitate their standalone executable
+functions.
+"""
+from enum import Enum
+from typing import Iterable
+
+from lib import aoc_main
+
+
+def part_1(input_: Iterable[str]) -> int:
+    reports = _build_reports(input_)
+    return len(list(filter(_is_safe, reports)))
+
+
+def part_2(input_: Iterable[str]):
+    pass
+
+
+def _build_reports(input_: Iterable[str]) -> list[map]:
+    reports = []
+    for line in input_:
+        reports.append(map(int, line.strip().split()))
+
+    return reports
+
+
+def _is_safe(report: Iterable[int]) -> bool:
+    # Iterator loop needs to know the direction it's trending, and the previous number
+    direction = None
+    prev_num = None
+    for num in iter(report):
+        # Sets first prev_num; loops
+        if prev_num is None:
+            prev_num = num
+            continue
+
+        difference = num - prev_num
+        # Changes that aren't between the values of 1 to 3 are considered unsafe
+        if abs(difference) not in range(1, 4): return False
+
+        # Sets direction on second number; set new prev_num before looping
+        if direction is None:
+            direction = _Direction.ASCENDING if difference > 0 else _Direction.DESCENDING
+            prev_num = num
+            continue
+
+        # If difference isn't consistent, it's considered unsafe
+        if (direction is _Direction.ASCENDING and difference < 0) or \
+                (direction is _Direction.DESCENDING and difference > 0):
+            return False
+
+        # Set new prev_num before continuing loop
+        prev_num = num
+
+    return True
+
+
+class _Direction(Enum):
+    ASCENDING = 1
+    DESCENDING = 2
+
+
+if __name__ == '__main__':
+    aoc_main('02.py', [part_1, part_2])
