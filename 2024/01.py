@@ -13,7 +13,7 @@ from typing import Iterable
 from lib import aoc_main
 
 
-def part_1(input_: Iterable[str]):
+def part_1(input_: Iterable[str]) -> int:
     lists = _build_lists(input_)
     # lists comes unsorted, part 1 needs them sorted
     for i in lists: i.sort()
@@ -27,20 +27,30 @@ def part_1(input_: Iterable[str]):
     return sum_
 
 
-def part_2(input_: Iterable[str]):
-    pass
+def part_2(input_: Iterable[str]) -> int:
+    l1, l2 = _build_lists(input_)
+    similarity_scores = {}
+    sum_ = 0
+    for num in l1:
+        score = similarity_scores.get(num)
+        # Memoize the similarity score if we haven't already
+        if score is None:
+            score = similarity_scores[num] = l2.count(num) * num
+
+        sum_ += score
+
+    return sum_
 
 
-def _build_lists(input_: Iterable[str]):
-    lists = ([], []) # The puzzle input is only two columns
+def _build_lists(input_: Iterable[str]) -> tuple[list[int], list[int]]:
+    lists: tuple[list[int], list[int]] = ([], [])  # The puzzle input is only two columns
     for line in input_:
         i = line.strip().split()
         for idx, val in enumerate(i):
             lists[idx].append(int(val))
 
-    # Part 1 specifies that these lists will be sorted, but I'm leaving it out until Part 2
     return lists
 
 
 if __name__ == '__main__':
-    aoc_main('01.py', [part_1, part_2])  # TODO Add file name
+    aoc_main('01.py', [part_1, part_2])
