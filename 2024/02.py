@@ -15,7 +15,7 @@ from lib import aoc_main
 
 def part_1(input_: Iterable[str]) -> int:
     reports = _build_reports(input_)
-    return len(list(filter(_is_safe, reports)))
+    return len(_validate_reports(reports)[0])
 
 
 def part_2(input_: Iterable[str]):
@@ -30,11 +30,11 @@ def _build_reports(input_: Iterable[str]) -> list[map]:
     return reports
 
 
-def _is_safe(report: Iterable[int]) -> bool:
+def _is_safe(report: Iterable[int]) -> None:
     # Iterator loop needs to know the direction it's trending, and the previous number
     direction = None
     prev_num = None
-    for num in iter(report):
+    for idx, num in enumerate(iter(report)):
         # Sets first prev_num; loops
         if prev_num is None:
             prev_num = num
@@ -42,7 +42,7 @@ def _is_safe(report: Iterable[int]) -> bool:
 
         difference = num - prev_num
         # Changes that aren't between the values of 1 to 3 are considered unsafe
-        if abs(difference) not in range(1, 4): return False
+        if abs(difference) not in range(1, 4): raise ValueError("Report is unsafe", idx)
 
         # Sets direction on second number; set new prev_num before looping
         if direction is None:
@@ -53,12 +53,26 @@ def _is_safe(report: Iterable[int]) -> bool:
         # If difference isn't consistent, it's considered unsafe
         if (direction is _Direction.ASCENDING and difference < 0) or \
                 (direction is _Direction.DESCENDING and difference > 0):
-            return False
+            raise ValueError("Report is unsafe", idx)
 
         # Set new prev_num before continuing loop
         prev_num = num
 
-    return True
+    # Exit _is_safe
+
+
+def _validate_reports(reports: Iterable) -> tuple[list, list]:
+    validated_reports = []
+    invalidated_reports = []
+
+    for r in reports:
+        try:
+            _is_safe(r)
+            validated_reports.append(r)
+        except ValueError:
+            invalidated_reports.append(r)
+
+    return validated_reports, invalidated_reports
 
 
 class _Direction(Enum):
