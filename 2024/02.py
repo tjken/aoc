@@ -28,8 +28,10 @@ def part_2(input_: Iterable[str]):
     for r in invalid:
         dampen_reports = _dampen(r[0], r[1])
         d_valid, d_invalid = _validate_reports(dampen_reports)
-        if len(d_valid) > 0: valid.append(d_valid[0])
-        else: l_invalid.append(d_invalid)
+        if len(d_valid) > 0:
+            valid.append(d_valid[0])
+        else:
+            l_invalid.append(d_invalid)
 
     #logger.debug(msg=l_invalid)
     return len(valid)
@@ -46,13 +48,11 @@ def _build_reports(input_: Iterable[str]) -> list[list]:
 def _dampen(report: list[int], error_idx) -> list[list[int]]:
     new_reports = []
 
-    # There's an edge case if error reports an index of 1 or 2; need to check index 0 as well
-    if error_idx == 1 or error_idx == 2:
-        new_reports.append(report[1:])
+    for i in range(len(report)):
+        report_copy = report[:]
+        report_copy.pop(i)
+        new_reports.append(report_copy)
 
-    report_copy = report[:]
-    report_copy.pop(error_idx)
-    new_reports.append(report_copy)
     return new_reports
 
 
