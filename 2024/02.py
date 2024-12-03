@@ -45,12 +45,23 @@ def _build_reports(input_: Iterable[str]) -> list[list]:
 
     return reports
 
-def _dampen(report: list[int], error_idx) -> list[list[int]]:
+def _dampen(report: list[int], error_idx, brute=True) -> list[list[int]]:
     new_reports = []
 
-    for i in range(len(report)):
+    if brute:
+        for i in range(len(report)):
+            report_copy = report[:]
+            report_copy.pop(i)
+            new_reports.append(report_copy)
+
+    # Ongoing attempt at solving without brute force. It almost works.
+    else:
+        # There's an edge case if error reports an index of 1 or 2; need to check index 0 as well
+        if error_idx == 1 or error_idx == 2:
+            new_reports.append(report[1:])
+
         report_copy = report[:]
-        report_copy.pop(i)
+        report_copy.pop(error_idx)
         new_reports.append(report_copy)
 
     return new_reports
