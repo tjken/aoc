@@ -2,6 +2,8 @@ import argparse
 import sys
 from typing import Iterable, Callable
 
+import lib.logging
+
 
 def aoc_main(prog_name: str, functions: Iterable[Callable]):
     args = parse(prog_name)
