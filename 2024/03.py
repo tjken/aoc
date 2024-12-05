@@ -13,11 +13,13 @@ from typing import Iterable
 
 from lib import aoc_main
 
-command = re.compile("mul\(\d+,\d+\)")
+command_mul = re.compile("mul\(\d+,\d+\)")
+command_do = re.compile("do\(\)")
+command_dont = re.compile("don't\(\)")
 
 def part_1(input_: Iterable[str]) -> int:
     input_ = _add_new_lines(input_)
-    items = map(_get_nums, command.findall(input_))
+    items = map(_get_nums, command_mul.findall(input_))
 
     sum_ = 0
     for item in items:
@@ -27,7 +29,16 @@ def part_1(input_: Iterable[str]) -> int:
 
 
 def part_2(input_: Iterable[str]):
-    pass
+    input_ = _add_new_lines(input_)
+    input_minus_dont = re.compile("don't\(\).*do\(\)").sub("", input_)
+    input_minus_dont = re.compile("don't\(\)").split(input_minus_dont)[0]
+    items = map(_get_nums, command_mul.findall(input_minus_dont))
+
+    sum_ = 0
+    for item in items:
+        sum_ += math.prod(item)
+
+    return sum_
 
 def _add_new_lines(lines: Iterable[str]) -> str:
     """Add new-line escape sequences to a list of strings.
@@ -37,6 +48,7 @@ def _add_new_lines(lines: Iterable[str]) -> str:
     input line by line, so this function exists to fix the input.
     """
     return "\n".join(lines)
+
 
 def _get_nums(s: str) -> tuple[int, int]:
     i1, i2 = s.removeprefix('mul(').removesuffix(')').split(',')
