@@ -48,20 +48,18 @@ class _Board:
 def _find_word_sum(word: str, board: _Board) -> int:
     # Use a prefix table to short-circuit out of bad word reads.
     prefixes = set()
-    for idx in range(1, len(word)): prefixes.add(word[:idx])
+    for index in range(1, len(word)): prefixes.add(word[:index])
 
     # Relative indices to search for words in; words must be in one direction
-    direction_idxs = (
+    directions = (
         tuple(filter(lambda x: x != (0, 0), product(range(-1, 2), repeat=2))))
-    board_idxs = product(range(board.x_bounds), range(board.y_bounds))
+    indices = product(range(board.x_bounds), range(board.y_bounds))
     sum_ = 0
 
     # For each board index, in each direction
-    items = product(board_idxs, direction_idxs)
-    for i in items:
-        idx: tuple[int, int] = i[0]
-        dir_ = i[1]
-        working_str = board.get_idx(idx)
+    lookups = product(indices, directions)
+    for index, direction in lookups:
+        working_str = board.get_idx(index)
         # Short circuit if the first letter is wrong
         if working_str not in prefixes: continue
 
@@ -70,9 +68,9 @@ def _find_word_sum(word: str, board: _Board) -> int:
             if working_str not in prefixes: break
 
             # Otherwise, get the next letter and try again
-            idx = tuple(map(add, idx, dir_))
+            index = tuple(map(add, index, direction))
             try:
-                working_str += board.get_idx(idx)
+                working_str += board.get_idx(index)
             except TypeError:
                 break
 
