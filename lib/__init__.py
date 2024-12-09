@@ -14,7 +14,11 @@ def aoc_main(prog_name: str, functions: Iterable[Callable]):
             _input = f.readlines()
 
         func_results = []
-        for f in functions: func_results.append(f(_input))
+        for f in functions:
+            try:
+                func_results.append(f(_input))
+            except NotImplementedError:
+                func_results.append("Not Implemented")
 
         results.append((file, func_results))
 
