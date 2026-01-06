@@ -1,3 +1,6 @@
+import main.java.Day01.Dial;
+import main.java.Day01.Direction;
+
 record Transaction(Direction direction, int amount) {
     static Transaction parse(String s) {
         return switch (s.charAt(0)) {

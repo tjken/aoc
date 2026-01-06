@@ -1,3 +1,5 @@
+package main.java.Day01;
+
 public class Dial {
     private int position;
     private final int MOD = 100;
